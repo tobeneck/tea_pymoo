@@ -270,7 +270,7 @@ class T_Crossover(Crossover):
 
         This is to be concidered when calculating the tracing information.
         '''
-        if pop.shape[1] != 2:
+        if pop.shape[1] != 2: #NOTE: for pymoo 0.6.0
             raise Exception("Tracing is not jet implemented for more than two parents on the crossover operator!")
 
         parents_X = pop.get("X")
@@ -317,5 +317,3 @@ class T_Crossover(Crossover):
             offspring_T = np.concatenate(offspring_T, axis=0)
 
             return Population.new("X", offspring_X, "T", offspring_T, "IsOff", IsOff)
-
-        #TODO: extract the traceing stuff here!

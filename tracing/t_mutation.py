@@ -3,6 +3,7 @@ import numpy as np
 from .t_sampling import TracingTypes, TraceList, TraceTuple
 
 from pymoo.core.mutation import Mutation
+from pymoo.core.population import Population
 
 
 class T_Mutation(Mutation):
@@ -123,9 +124,6 @@ class T_Mutation(Mutation):
             if np.equal(parent_X, child_X).all() : #return the parents trace list if the value was not altered. Also avoid divide by 0 error.
                 offspring_T[indIndex] = parents_T[indIndex]
             else:
-                #TODO: is this again the 0 problem?
-                # influence_factor_mut = ( np.absolute(parent_X - child_X) / ( np.absolute(parent_X) + np.absolute(parent_X - child_X) ) )
-                # influence_factor_old = 1.0 - influence_factor_mut
 
                 for geneIndex in range(0, len(parent_X)):#build the child trace vectors based on the parents and the influence factors
 
@@ -136,7 +134,7 @@ class T_Mutation(Mutation):
                         influence_factor_old = 1.0 - influence_factor_mut
                         
                         offspring_T[indIndex, geneIndex, :-1] = parents_T[indIndex, geneIndex, :-1] * influence_factor_old
-                        oldScaledMutImpact = parents_T[indIndex, geneIndex,  -1] * influence_factor_old #TODO: sometimes the old influence factor is not grabbed correctly!
+                        oldScaledMutImpact = parents_T[indIndex, geneIndex,  -1] * influence_factor_old
                         offspring_T[indIndex, geneIndex,  -1] = oldScaledMutImpact + influence_factor_mut
 
         return np.array(offspring_T)
@@ -189,25 +187,30 @@ class T_Mutation(Mutation):
         self.accumulate_mutations = accumulate_mutations
 
 
+    def _do(self, problem, X):
+        return self.mutation._do(problem, X)
+
     def do(self, problem, pop, inplace=True, **kwargs):
         
+        X_p = pop.get("X") #the parent genome values. Coppy this here to avoid inplace errors
+        T_p = pop.get("T")
+
         offspring = self.mutation.do(problem, pop, inplace, **kwargs)
+
 
         IsOff = np.ones(len(offspring), dtype=bool) #in the operators, all individuals are marked to be offspring
 
-        X_p = pop.get("X") #the parent genome values
-        T_p = pop.get("T")
         X_m = offspring.get("X") #the mutated genome values
 
         if self.tracing_type == TracingTypes.NO_TRACING: #return if not tracing
-            return pop.new("X", X_m, "IsOff", IsOff)
+            return Population.new("X", X_m, "IsOff", IsOff)
         elif self.tracing_type == TracingTypes.TRACE_ID:
             T_m = self.calculateOffspringTraceIDs(X_p, X_m, T_p)
-            return pop.new("X", X_m, "T", T_m), "IsOff", IsOff
+            return Population.new("X", X_m, "T", T_m), "IsOff", IsOff
         elif self.tracing_type == TracingTypes.TRACE_LIST:
             T_m = self.calculateOffspringTraceLists(X_p, X_m, T_p)
-            return pop.new("X", X_m, "T", T_m, "IsOff", IsOff)
+            return Population.new("X", X_m, "T", T_m, "IsOff", IsOff)
         elif self.tracing_type == TracingTypes.TRACE_VECTOR:
             T_m = self.calculateOffspringTraceVectors(X_p, X_m, T_p)
-            return pop.new("X", X_m, "T", T_m, "IsOff", IsOff)
+            return Population.new("X", X_m, "T", T_m, "IsOff", IsOff)
 
