@@ -185,6 +185,7 @@ class T_Mutation(Mutation):
         self.mutation = mutation
         self.tracing_type = tracing_type
         self.accumulate_mutations = accumulate_mutations
+        self.mutation_counter = 0
 
 
     def _do(self, problem, X):
