@@ -270,6 +270,12 @@ class T_Crossover(Crossover):
 
         This is to be concidered when calculating the tracing information.
         '''
+
+        # if a parents with array with mating indices is provided -> transform the input first
+        if parents is not None:
+            pop = [pop[mating] for mating in parents]
+        pop = Population(pop) #this is needed to avoid errors, otherwise pop will be interpreted as a list
+        
         if pop.shape[1] != 2: #NOTE: for pymoo 0.6.0
             raise Exception("Tracing is not jet implemented for more than two parents on the crossover operator!")
 
@@ -280,7 +286,7 @@ class T_Crossover(Crossover):
         n_matings = len(pop)
         n_var = problem.n_var
         generated_offspring_shape=(self.crossover.n_offsprings, n_matings)
-        offspring = self.crossover.do(problem, pop, parents, **kwargs).reshape(generated_offspring_shape) 
+        offspring = self.crossover.do(problem, pop, **kwargs).reshape(generated_offspring_shape) 
         offspring_X = offspring.get("X")
 
         n_offspring, n_parents = offspring.shape
