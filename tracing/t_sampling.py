@@ -26,7 +26,39 @@ class T_Sampling(Sampling):
         self.tracing_type = tracing_type
     
     def do(self, problem, n_samples, **kwargs):
-        val = self.sampling._do(problem, n_samples, **kwargs)
+        return self.do(problem, n_samples, seeds=None, **kwargs)
+
+    def do(self, problem, n_samples, seeds=None, **kwargs):
+        '''
+        This method calls the in the constructor provided sampler and adds the tracing information based on the specified trace type.
+
+        Also, it provides the option to seed individuals in the initial population, which is usefull to avoid re-calculation of the trace information.
+        The seeds will always be placed at the beginning of the population.
+
+        Parameters:
+        -----------
+        problem : pymoo.core.problem
+            The problem for which the samples should be created.
+        n_samples : int
+            The number of samples to be created.
+        seeds : np.array(2D) (optional)
+            Individuals to seed the returned population with.
+        
+        Returns:
+        --------
+        Population : pymoo.core.population
+            The sampled population including the tracing information.
+        '''
+
+        #handle the seeding:
+        if seeds is not None and len(seeds) > n_samples:
+            raise Exception("You can't use more seeds than you wand to sample!")
+        elif seeds is not None and len(seeds) == n_samples:
+            val = seeds
+        elif seeds is not None and len(seeds) < n_samples:
+            val = np.concatenate((seeds, self.sampling._do(problem, n_samples-len(seeds), **kwargs)), axis=0)
+        else:
+            val = self.sampling._do(problem, n_samples)
 
         #create the offspring flags
         IsOff = np.zeros(len(val), dtype=bool) #in the initial population, all individuals are marked to be non offspring (or parents)
