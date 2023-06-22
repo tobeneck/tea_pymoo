@@ -5,7 +5,7 @@ from tea_pymoo.callbacks.data_collector import DataCollector
 
 class Performance_Callback(DataCollector):
 
-    def __init__(self, additional_run_info=None) -> None:
+    def __init__(self, additional_run_info=None, filename="performance") -> None:
         '''
         This callback saves the fitness performance of a single-objective algorithm.
 
@@ -13,7 +13,7 @@ class Performance_Callback(DataCollector):
         '''
         data_keys = ["generation", "min_f", "mean_f", "median_f", "max_f"]
         
-        super().__init__(data_keys=data_keys, filename="performance", additional_run_info=additional_run_info)
+        super().__init__(data_keys=data_keys, filename=filename, additional_run_info=additional_run_info)
 
     def notify(self, algorithm):
         super().handle_additional_run_info()

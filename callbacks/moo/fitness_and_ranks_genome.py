@@ -81,7 +81,7 @@ def getBelegunduRanks(population, minimize):
 
 class Fitness_and_Ranks_Callback(DataCollector):
 
-    def __init__(self, n_obj, additional_run_info=None, minimize=True, fonsecaAndFlemingRank=False, goldbergRank=True, belegunduRank=False, dist_to_pf=False, fitness=True) -> None:
+    def __init__(self, n_obj, additional_run_info=None, minimize=True, fonsecaAndFlemingRank=False, goldbergRank=True, belegunduRank=False, dist_to_pf=False, fitness=True, filename="fitness_and_ranks") -> None:
         '''
         this class saves the gitness values, rank and genome values of the individuals
         Parameters
@@ -123,7 +123,7 @@ class Fitness_and_Ranks_Callback(DataCollector):
         if self.dist_to_pf:
             data_keys.append("dist_to_pf")
 
-        super().__init__(data_keys=data_keys, filename="fitness_and_ranks", additional_run_info=additional_run_info)
+        super().__init__(data_keys=data_keys, filename=filename, additional_run_info=additional_run_info)
 
     def notify(self, algorithm):
 

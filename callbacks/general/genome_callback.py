@@ -4,7 +4,7 @@ from tea_pymoo.callbacks.data_collector import DataCollector
 
 class Genome_Callback(DataCollector):
 
-    def __init__(self, n_var, additional_run_info=None) -> None:
+    def __init__(self, n_var, additional_run_info=None, filename="genome") -> None:
         '''
         this class saves the gitness values, rank and genome values of the individuals
         Parameters
@@ -20,7 +20,7 @@ class Genome_Callback(DataCollector):
         for i in range(0, n_var):
             data_keys.append("g_"+str(i+1))
 
-        super().__init__(additional_run_info=additional_run_info, data_keys=data_keys, filename="genome")
+        super().__init__(additional_run_info=additional_run_info, data_keys=data_keys, filename=filename)
 
     def notify(self, algorithm):
 

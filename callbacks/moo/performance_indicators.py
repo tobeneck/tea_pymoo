@@ -14,9 +14,9 @@ class Performance_Indicators_Callback(DataCollector):
                 calc_gd_plus=True, 
                 calc_igd_plus=True, 
                 hv_ref_points=[],
-                normalize_performance_indicators=True) -> None:
+                normalize_performance_indicators=True,
+                filename="performance_indicators") -> None:
 
-        self.filename ="performance_indicators"
         self.normalize_performance_indicators = normalize_performance_indicators
         self.hv_ref_points = hv_ref_points
         data_keys = ["generation", "eval"]
@@ -34,7 +34,7 @@ class Performance_Indicators_Callback(DataCollector):
             for i in range(len(hv_ref_points)):
                 data_keys.append("hv_p"+str(i))
         
-        super().__init__(data_keys=data_keys, filename="performance_indicators")
+        super().__init__(data_keys=data_keys, filename=filename)
 
     def notify(self, algorithm):
         generation = algorithm.n_gen
