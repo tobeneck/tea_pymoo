@@ -1,23 +1,36 @@
 import numpy as np
 
-from .data_collector import DataCollector
+from tea_pymoo.callbacks.data_collector import DataCollector
 
-import sys
-sys.path.append('../')
-from tracing.t_sampling import TracingTypes
+from tea_pymoo.tracing.t_sampling import TracingTypes
 
 
-class Counting_Impact(DataCollector):
+class Counting_Impact_Callback(DataCollector):
 
-    def __init__(self, initial_popsize, tracing_type=TracingTypes.TRACE_ID) -> None:
+    def __init__(self, initial_popsize, tracing_type=TracingTypes.TRACE_ID, additional_run_info=None) -> None:
+        '''
+        This callback saves the counting impact of the initial population for each generation.
+
+        Parameters:
+        -----------
+        initial_popsize : int
+            The size of the initial population (/the number of traceIDs).
+        tracing_type : TracingTypes
+            The type of tracing used.
+        additional_run_info : dict
+            An optional dictionary of additional infos for the config of this run. Usefull to save data like or the run number or other inportant configurations.
+        '''
 
         self.tracing_type = tracing_type
         self.max_traceID = initial_popsize
+        self.additional_keys = additional_run_info
+
         data_keys = ["generation"]
         for i in range(initial_popsize):
             data_keys.append("traceID_"+str(i+1))
         data_keys.append("traceID_m")
-        super().__init__(data_keys=data_keys, filename="counting_impact")
+
+        super().__init__(data_keys=data_keys, filename="counting_impact", additional_run_info=additional_run_info)
           
     def print_traceID_counting_impact(self, population):
         counting_impact = np.zeros(self.max_traceID+1)
@@ -33,7 +46,6 @@ class Counting_Impact(DataCollector):
         #calculate the impact
         counting_impact = np.zeros(shape=(self.max_traceID + 1 )) #TODO: accumulates the impact of mutation to -1
     
-
         for i in range(len(population)): #iterate over every individual
             for g in population[i].get("T"): #iterate over the genes of the current individual
                 currentTraceList = g
@@ -57,11 +69,10 @@ class Counting_Impact(DataCollector):
         return counting_impact
 
     def notify(self, algorithm):
+        super().handle_additional_run_info()
 
-        generation = algorithm.n_gen - 1
+        generation = algorithm.n_gen
         population = algorithm.pop
-
-
 
         counting_impact = []
         if self.tracing_type == TracingTypes.NO_TRACING:

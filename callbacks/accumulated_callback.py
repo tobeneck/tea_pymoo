@@ -1,4 +1,6 @@
 import pandas as pd
+
+from os.path import exists
 from pathlib import Path
 
 from pymoo.core.callback import Callback
@@ -30,8 +32,10 @@ class AccumulateCallbacks(Callback):
         out_path : string
             the filepath the data should be saved to
         '''
-        data_list = []
         for collector in self.collectors:
             df = pd.DataFrame(collector.data)
-            #df.to_csv(Path(out_path) / str(collector.filename+".csv.gz"), compression="gzip")
-            df.to_csv(Path(out_path) / str(collector.filename+".csv"))
+            output_filename = Path(out_path) / str(collector.filename+".csv")
+            df.to_csv(output_filename, mode='a', index=False, header=(not exists(output_filename)) )
+
+            #output_filename = Path(out_path) / str(collector.filename+".csv.gz")
+            #df.to_csv(output_filename, mode='a', index=False, header=(not exists(output_filename)), compression="gzip")

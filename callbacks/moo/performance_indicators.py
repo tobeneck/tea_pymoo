@@ -1,7 +1,4 @@
-#NOTE: this file depends on generate_initial_pop.py
-import numpy as np
-
-from .data_collector import DataCollector
+from tea_pymoo.callbacks.data_collector import DataCollector
 
 from pymoo.indicators.gd import GD
 from pymoo.indicators.igd import IGD
@@ -9,7 +6,7 @@ from pymoo.indicators.gd_plus import GDPlus
 from pymoo.indicators.igd_plus import IGDPlus
 from pymoo.indicators.hv import Hypervolume
 
-class Performance_Indicators(DataCollector):
+class Performance_Indicators_Callback(DataCollector):
 
     def __init__(self, 
                 calc_gd=True, 
@@ -21,6 +18,7 @@ class Performance_Indicators(DataCollector):
 
         self.filename ="performance_indicators"
         self.normalize_performance_indicators = normalize_performance_indicators
+        self.hv_ref_points = hv_ref_points
         data_keys = ["generation", "eval"]
         if calc_gd:
             data_keys.append("gd")
@@ -59,4 +57,4 @@ class Performance_Indicators(DataCollector):
                 self.data[key].append( IGDPlus(pf=pareto_front, zero_to_one=self.normalize_performance_indicators).do(_F) )
             elif key[:2] == "hv":
                 point_index = int(key.split("_")[1])
-                self.data[key].append( Hypervolume(ref_point=hv_ref_points[point_index], zero_to_one=self.normalize_performance_indicators).do(_F) )
+                self.data[key].append( Hypervolume(ref_point=self.hv_ref_points[point_index], zero_to_one=self.normalize_performance_indicators).do(_F) )

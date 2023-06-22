@@ -1,9 +1,10 @@
 import numpy as np
 
-from .data_collector import DataCollector
+from tea_pymoo.callbacks.data_collector import DataCollector
 
 from pymoo.util.misc import vectorized_cdist #for "getDistanceToClosestPointOnPF"
 from pymoo.indicators.distance_indicator import euclidean_distance #for "getDistanceToClosestPointOnPF"
+from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
 
 #calculates the distance of a reference point to the closest point in pareto_front using the eucledian distance
 def getDistanceToClosestPointOnPF(reference_solution, pareto_front):
@@ -42,8 +43,6 @@ def getFonsecaAndFlemingRanks(population, minimize):
     
     return ranks
 
-from pymoo.util.nds.non_dominated_sorting import NonDominatedSorting
-
 #returns the ranks of the individuals of the population as an array
 def getGoldbergRanks(population, minimize):
 
@@ -80,17 +79,14 @@ def getBelegunduRanks(population, minimize):
 
 
 
+class Fitness_and_Ranks_Callback(DataCollector):
 
-class Fitness_Rank_Genome(DataCollector):
-
-    def __init__(self, n_obj, n_var, minimize=True, fonsecaAndFlemingRank=False, goldbergRank=True, belegunduRank=False, dist_to_pf=False, fitness=True, genome=True) -> None:
+    def __init__(self, n_obj, additional_run_info=None, minimize=True, fonsecaAndFlemingRank=False, goldbergRank=True, belegunduRank=False, dist_to_pf=False, fitness=True) -> None:
         '''
         this class saves the gitness values, rank and genome values of the individuals
         Parameters
             n_obj : int
                 the number of objective functions
-            n_var : int
-                the genome size
             minimize : boolean
                 if the problem is a minimization problem
             fonsecaAndFlemingRank : boolean
@@ -118,9 +114,6 @@ class Fitness_Rank_Genome(DataCollector):
         if fitness:
             for i in range(0, n_obj):
                 data_keys.append("f_"+str(i+1))
-        if genome:
-            for i in range(0, n_var):
-                data_keys.append("g_"+str(i+1))
         if self.fonsecaAndFlemingRank:
             data_keys.append("fonseca_fleming_rank")
         if self.goldbergRank:
@@ -130,15 +123,13 @@ class Fitness_Rank_Genome(DataCollector):
         if self.dist_to_pf:
             data_keys.append("dist_to_pf")
 
-        super().__init__(data_keys=data_keys, filename="fitness_rank_genome")
+        super().__init__(data_keys=data_keys, filename="fitness_and_ranks", additional_run_info=additional_run_info)
 
     def notify(self, algorithm):
 
         generation = algorithm.n_gen
-        _F = algorithm.opt.get('F')
-        pareto_front = algorithm.problem.pareto_front()
         population = algorithm.pop
-        n_obj = algorithm.problem.n_obj
+        pareto_front = algorithm.problem.pareto_front()
 
 
         #calculate all ranks
