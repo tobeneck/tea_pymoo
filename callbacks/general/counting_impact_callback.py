@@ -7,7 +7,7 @@ from tea_pymoo.tracing.t_sampling import TracingTypes
 
 class Counting_Impact_Callback(DataCollector):
 
-    def __init__(self, initial_popsize, tracing_type=TracingTypes.TRACE_ID, additional_run_info=None, filename="counting_impact") -> None:
+    def __init__(self, initial_popsize, tracing_type=TracingTypes.TRACE_ID, additional_run_info=None, optimal_inds_only=True, filename="counting_impact") -> None:
         '''
         This callback saves the counting impact of the initial population for each generation.
 
@@ -24,6 +24,7 @@ class Counting_Impact_Callback(DataCollector):
         self.tracing_type = tracing_type
         self.max_traceID = initial_popsize
         self.additional_keys = additional_run_info
+        self.optimal_inds_only = optimal_inds_only
 
         data_keys = ["generation"]
         for i in range(initial_popsize):
@@ -73,6 +74,8 @@ class Counting_Impact_Callback(DataCollector):
 
         generation = algorithm.n_gen
         population = algorithm.pop
+        if self.optimal_inds_only:
+            population = algorithm.opt
 
         counting_impact = []
         if self.tracing_type == TracingTypes.NO_TRACING:
