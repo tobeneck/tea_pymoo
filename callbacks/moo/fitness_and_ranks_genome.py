@@ -142,6 +142,7 @@ class Fitness_and_Ranks_Callback(DataCollector):
         
         #save the population data
         for i in range(0, len(population)):
+            super().handle_additional_run_info()
             for key in self.data.keys():
                 if key == "generation":
                     self.data[key].append(generation)
@@ -161,5 +162,3 @@ class Fitness_and_Ranks_Callback(DataCollector):
                 elif key[:2] == "g_":
                     genome_index = int( key.split("_")[1] ) - 1
                     self.data[key].append(population[i].X[genome_index])
-        
-        super().handle_additional_run_info(times=len(population))

@@ -16,7 +16,7 @@ class DataCollector(Callback):
         
         self.filename = filename
 
-    def handle_additional_run_info(self, times:int=1):
+    def handle_additional_run_info(self):
         '''
         this function is called at the end of the notify function to add the additional_run_info to the data dictionary
         
@@ -28,5 +28,4 @@ class DataCollector(Callback):
         '''
         if self.additional_run_info:
             for key in self.additional_run_info.keys():
-                info_to_be_added = [ self.additional_run_info[key] ] * times #creates array of size "times"
-                self.data[key].extend(info_to_be_added)
+                self.data[key].append(self.additional_run_info[key])
