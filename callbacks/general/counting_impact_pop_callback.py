@@ -5,11 +5,11 @@ from tea_pymoo.callbacks.data_collector import DataCollector
 from tea_pymoo.tracing.t_sampling import TracingTypes
 
 
-class Counting_Impact_Callback(DataCollector):
+class Counting_Impact_Pop_Callback(DataCollector):
 
-    def __init__(self, initial_popsize, tracing_type=TracingTypes.TRACE_ID, additional_run_info=None, optimal_inds_only=True, filename="counting_impact") -> None:
+    def __init__(self, initial_popsize, tracing_type=TracingTypes.TRACE_ID, additional_run_info=None, optimal_inds_only=True, filename="counting_impact_pop") -> None:
         '''
-        This callback saves the counting impact of the initial population for each generation.
+        This callback saves the counting impact of the initial population for each generation, accumulated for the whole population.
 
         Parameters:
         -----------
@@ -91,7 +91,6 @@ class Counting_Impact_Callback(DataCollector):
             if key == "generation":
                 self.data[key].append(generation)
             elif key == "traceID_m":
-                #print(counting_impact[-1])
                 self.data[key].append(counting_impact[-1])
             elif key[:7] == "traceID":
                 trace_index = int( key.split("_")[1] ) - 1 #there is no traceID 0, we shift everything to 1

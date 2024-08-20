@@ -29,9 +29,7 @@ class Performance_Indicators_Callback(DataCollector):
             data_keys.append("gd+")
         if calc_igd_plus:
             data_keys.append("igd+")
-        if len(hv_ref_points) == 1:
-            data_keys.append("hv")
-        elif len(hv_ref_points) < 1:
+        if len(hv_ref_points) <= 1:
             for i in range(len(hv_ref_points)):
                 data_keys.append("hv_p"+str(i))
         
@@ -57,7 +55,7 @@ class Performance_Indicators_Callback(DataCollector):
             elif key == "igd+":
                 self.data[key].append( IGDPlus(pf=pareto_front, zero_to_one=self.normalize_performance_indicators).do(_F) )
             elif key[:2] == "hv":
-                point_index = int(key.split("_")[1])
-                self.data[key].append( Hypervolume(ref_point=self.hv_ref_points[point_index], zero_to_one=self.normalize_performance_indicators).do(_F) )
+                point_index = int(key.split("_p")[1])
+                self.data[key].append( Hypervolume(ref_point=self.hv_ref_points[point_index], zero_to_one=False).do(_F) )
         
         super().handle_additional_run_info()
