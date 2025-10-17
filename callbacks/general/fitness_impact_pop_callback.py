@@ -1,7 +1,5 @@
 import numpy as np
 
-from tea_pymoo.callbacks.data_collector import DataCollector
-
 from tea_pymoo.tracing.t_sampling import TracingTypes
 
 from tea_pymoo.callbacks.general.fitness_impact_inds_callback import Fitness_Impact_Inds_Callback
@@ -63,7 +61,7 @@ class Fitness_Impact_Pop_Callback(Fitness_Impact_Inds_Callback):
                 current_fitness = population[i].get("F")[0]
                 fd = 1 + np.abs(worst_fitness - current_fitness)
 
-                fitness_impact += (current_ind_fitness_impact / (len(population) * fd ))
+                fitness_impact += (current_ind_fitness_impact / len(population) )
         
         for key in self.data.keys():
             if key == "generation":
