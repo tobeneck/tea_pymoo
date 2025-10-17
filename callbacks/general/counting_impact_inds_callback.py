@@ -32,39 +32,15 @@ class Counting_Impact_Inds_Callback(DataCollector):
         data_keys.append("traceID_m")
 
         super().__init__(data_keys=data_keys, filename=filename, additional_run_info=additional_run_info)
-          
-    def print_traceID_counting_impact(self, ind):
-        counting_impact = np.zeros(self.max_traceID+1)
-        T = ind.get("T")
-        for i in range(self.max_traceID):
-            counting_impact[i] = (T == i).sum() / self.max_traceID
-        counting_impact[-1] = (T < 0).sum() / self.max_traceID
-
-        return counting_impact
-
-    def print_traceList_counting_impact(self, ind):
-        #calculate the impact
-        counting_impact = np.zeros(shape=(self.max_traceID + 1 )) # +1 for mutation
-    
-        for g in ind.get("T"): #iterate over the genes of the current individual
-            currentTraceList = g
-            genome_length = len(ind.get("X"))
-            for tt in currentTraceList.get_all():
-                currentTraceID = tt.traceID
-                if currentTraceID >= 0:
-                    counting_impact[currentTraceID] = counting_impact[currentTraceID] + (tt.influenceFactor / genome_length)
-                if currentTraceID < 0:
-                    counting_impact[self.max_traceID] = counting_impact[self.max_traceID] + (tt.influenceFactor / genome_length)
-        
-        return counting_impact
 
     def print_traceVector_counting_impact(self, ind):        
         counting_impact = np.zeros( self.max_traceID + 1 )
         T = ind.get("T")
-        X = ind.get("X")
+        X = ind.get("X") 
 
-        counting_impact = T.sum(axis=0).sum(axis=0) / (X.shape[0] * X.shape[1])
+        counting_impact = T.sum(axis=0) / ( len(X) ) # len(X) = genome_length
         return counting_impact
+    
 
     def notify(self, algorithm):
 
@@ -79,11 +55,11 @@ class Counting_Impact_Inds_Callback(DataCollector):
             if self.tracing_type == TracingTypes.NO_TRACING:
                 return
             elif self.tracing_type == TracingTypes.TRACE_ID:
-                counting_impact = self.print_traceID_counting_impact(population)
+                raise NotImplementedError("Counting impact for each ind individually is currently only implemented for trace vector representation.")
             elif self.tracing_type == TracingTypes.TRACE_LIST:
-                counting_impact = self.print_traceList_counting_impact(population)
+                raise NotImplementedError("Counting impact for each ind individually is currently only implemented for trace vector representation.")
             elif self.tracing_type == TracingTypes.TRACE_VECTOR:
-                counting_impact = self.print_traceVector_counting_impact(population)
+                counting_impact = self.print_traceVector_counting_impact(population[i])
 
             for key in self.data.keys():
                 if key == "generation":
