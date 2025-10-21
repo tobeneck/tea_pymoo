@@ -13,14 +13,38 @@ There are three kinds of callbacks. Logging performance is split into **MOO** an
 
 ### General
 
-**counting_impact_inds_callback.py**
-Loggs the counting impact, for each individual separately.
+**genome_callback.py**
+Loggs the genome values of the individuals.
+
+#### Impact Metrics
+
+##### Population Whide
 
 **counting_impact_pop_callback.py**
 Loggs the counting impact of the whole population, or just the non-dominated individuals.
 
-**genome_callback.py**
-Loggs the genome values of the individuals.
+**fitness_impact_pop_callback.py**
+Loggs the fitness impact of the whole population, or just the non-dominated individuals.
+
+**entropy_impact_pop_callback.py**
+Loggs the entropy impact of the whole population, or just the non-dominated individuals.
+
+**fitness_entropy_impact_pop_callback.py**
+Loggs the fitness+entropy impact of the whole population, or just the non-dominated individuals.
+
+##### For each Individual
+
+**counting_impact_inds_callback.py**
+Loggs the counting impact, for each individual separately.
+
+(Fitness impact for each ind does not exist, as scaling the one individual by its own fitness is just returning the counting impact)
+
+**entropy_impact_inds_callback.py**
+Loggs the entropy impact, for each individual separately.
+
+(Fitness+entropy impact for each ind does not exist, as scaling the one individual by its own fitness is just returning the entropy impact)
+
+
 
 ### MOO
 

@@ -50,6 +50,9 @@ class T_Mutation(Mutation):
 
             if p_x == new_c_x : #return the parents trace list if the value was not altered
                 return p_tl
+            
+            if not self.value_dependent_mutation: #return trace list with only mutationID if mutation is value independent
+                return TraceList([TraceTuple(self.mutation_counter, 1.0)])
 
             influence_factor_mut = abs(p_x - new_c_x) / ( abs(p_x) + abs(p_x - new_c_x) )
             influence_factor_old = 1 - influence_factor_mut
@@ -123,8 +126,7 @@ class T_Mutation(Mutation):
 
             if np.equal(parent_X, child_X).all() : #return the parents trace list if the value was not altered. Also avoid divide by 0 error.
                 offspring_T[indIndex] = parents_T[indIndex]
-            else:
-
+            elif self.value_dependent_mutation: #calculate the influence based on the old factors if the mutation operator is value dependent
                 for geneIndex in range(0, len(parent_X)):#build the child trace vectors based on the parents and the influence factors
 
                     if parent_X[geneIndex] == child_X[geneIndex]: #the not mutated case
@@ -136,6 +138,14 @@ class T_Mutation(Mutation):
                         offspring_T[indIndex, geneIndex, :-1] = parents_T[indIndex, geneIndex, :-1] * influence_factor_old
                         oldScaledMutImpact = parents_T[indIndex, geneIndex,  -1] * influence_factor_old
                         offspring_T[indIndex, geneIndex,  -1] = oldScaledMutImpact + influence_factor_mut
+            else: #simple case, just assign the mutation traceID
+                for geneIndex in range(0, len(parent_X)):#build the child trace vectors based on the parents and the influence factors
+
+                    if parent_X[geneIndex] == child_X[geneIndex]: #the not mutated case
+                        offspring_T[indIndex, geneIndex, :] = parents_T[indIndex, geneIndex, :]
+                    else :
+                        offspring_T[indIndex, geneIndex, :-1] = np.zeros( len(offspring_T[indIndex, geneIndex, :-1]) )#parents_T[indIndex, geneIndex, :-1]
+                        offspring_T[indIndex, geneIndex,  -1] = 1.0 #full influence of the mutation
 
         return np.array(offspring_T)
 
@@ -180,13 +190,13 @@ class T_Mutation(Mutation):
         return children_T
 
 
-    def __init__(self, mutation, tracing_type=TracingTypes.NO_TRACING, accumulate_mutations=True, **kwargs):
+    def __init__(self, mutation, tracing_type=TracingTypes.NO_TRACING, accumulate_mutations=True, value_dependent=True, **kwargs):
         super().__init__(prob=mutation.prob, prob_var=mutation.prob_var, **kwargs)
         self.mutation = mutation
         self.tracing_type = tracing_type
         self.accumulate_mutations = accumulate_mutations
         self.mutation_counter = 0
-
+        self.value_dependent_mutation = value_dependent
 
     def _do(self, problem, X):
         return self.mutation._do(problem, X)

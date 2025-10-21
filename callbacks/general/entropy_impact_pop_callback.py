@@ -57,10 +57,10 @@ class Entropy_Impact_Pop_Callback(Entropy_Impact_Inds_Callback):
             elif self.tracing_type == TracingTypes.TRACE_LIST:
                 raise NotImplementedError("Entropy impact for each ind individually is currently only implemented for trace vector representation.")
             elif self.tracing_type == TracingTypes.TRACE_VECTOR:
-                current_ind_entropy_impact = self.print_traceVector_entropy_impact(population[i], entr)
+                current_ind_entropy_impact = self.print_traceVector_entropy_impact(i, population, entr)
 
-                entropy_impact += (current_ind_entropy_impact / (len(population)))
-        
+                entropy_impact += (current_ind_entropy_impact / len(population) )
+
         for key in self.data.keys():
             if key == "generation":
                 self.data[key].append(generation)

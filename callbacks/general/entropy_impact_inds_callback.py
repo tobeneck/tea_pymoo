@@ -18,14 +18,15 @@ def get_entropy_vector(population):
     for j in range(n_var):
         trace_column = T[:, j]
         unique_cols = np.unique(trace_column, axis=0)
-        #print("unique cols", unique_cols)
 
         for col in unique_cols:
             matches = np.all(trace_column == col, axis=1) #returns how many times col appears in the trace column
             p_col = matches.sum() / n_individuals
             entropy_vector[j] += ( p_col * np.log2(p_col) )
 
-    return -entropy_vector #don't forget to add -1
+    entropy_vector = -entropy_vector
+    entropy_vector += 1 #add 1 to avoid division by 0
+    return entropy_vector #don't forget to add -1
 
 
 
@@ -57,14 +58,16 @@ class Entropy_Impact_Inds_Callback(DataCollector):
 
         super().__init__(data_keys=data_keys, filename=filename, additional_run_info=additional_run_info)
 
-    def print_traceVector_entropy_impact(self, ind, entropy):        
+    def print_traceVector_entropy_impact(self, ind_idx, population, entropy):        
         entropy_impact = np.zeros( self.max_traceID + 1 )
-        T = ind.get("T")
+        trace_vector = population[ind_idx].get("T")
 
         #scale T with the entropy
-        T = T * entropy[:, np.newaxis]
+        trace_vector= trace_vector * entropy[:, np.newaxis]# essentially, we need to scale with the sum of the entropie for each row (I think)
 
-        entropy_impact = ( T.sum(axis=0)) / ( entropy.sum() ) # essentially, we need to scale with the sum of the entropie for each row (I think)
+        entropy_impact = ( trace_vector.sum(axis=0))
+        entropy_impact = entropy_impact / entropy_impact.sum() # normalize this way due to entropy scaling
+
         return entropy_impact
     
     def notify(self, algorithm):
@@ -92,6 +95,7 @@ class Entropy_Impact_Inds_Callback(DataCollector):
                 raise NotImplementedError("Entropy impact for each ind individually is currently only implemented for trace vector representation.")
             elif self.tracing_type == TracingTypes.TRACE_VECTOR:
                 entropy_impact = self.print_traceVector_entropy_impact(population[i], entr)
+                
 
             for key in self.data.keys():
                 if key == "generation":
